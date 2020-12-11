@@ -1,0 +1,8 @@
+Compiling build :dev to "resources/public/js/cljsbuild-main.js" from ["src/cljs"]...
+[32mSuccessfully compiled build :dev to "resources/public/js/cljsbuild-main.js" in 0.417 seconds.[0m
+notifying browser that file changed:  resources/public/js/cljsbuild-main.js
+notifying browser that file changed:  resources/public/js/cljs-dev/goog/deps.js
+notifying browser that file changed:  resources/public/js/cljs-dev/drums/core.js
+Compiling build :dev to "resources/public/js/cljsbuild-main.js" from ["src/cljs"]...
+[32mSuccessfully compiled build :dev to "resources/public/js/cljsbuild-main.js" in 0.342 seconds.[0m
+notifying browser that file changed:  resources/public/js/cljs-dev/drums/core.js

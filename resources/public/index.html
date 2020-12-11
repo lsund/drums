@@ -6,11 +6,9 @@
     <body>
         <div id="cljs-target"></div>
         <div id="footer-javascripts">
-            <script src="js/cljs-dev/goog/base.js"></script>
-            <script src="js/cljsbuild-main.js"></script>
-            <script>
-                drums.core.run();
-            </script>
+            <script src="./client/goog/base.js"></script>
+            <script src="main.js"></script>
+            <script>goog.require('drums.core')</script>
         </div>
     </body>
 </html>

@@ -46,9 +46,9 @@
   [:div
    [:h1 "Kick"]
    (app/sub-component :kicks event-channel (:kicks @app-state) (:tick @app-state))
-   [:h1 "snare"]
+   [:h1 "Snare"]
    (app/sub-component :snares event-channel (:snares @app-state) (:tick @app-state))
-   [:h1 "reset"]
+   [:h1 "Reset"]
    [:button {:on-click #(put! event-channel [:reset {}])} "Reset"]])
 
 (go
@@ -56,7 +56,7 @@
     (let [[event-name event-data] (<! event-channel)]
       ((event-name events) event-data))))
 
-(js/setInterval (fn [] (put! event-channel [:tick {}])) (bpm-to-interval (:bpm @app-state)))
+(defonce set-interval
+    (js/setInterval (fn [] (put! event-channel [:tick {}])) (bpm-to-interval (:bpm @app-state))))
 
-(defn ^:export run []
-  (rdom/render [app] (js/document.getElementById "cljs-target")))
+(rdom/render [app] (js/document.getElementById "cljs-target"))

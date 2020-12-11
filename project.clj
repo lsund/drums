@@ -12,14 +12,27 @@
                  [hiccup "1.0.5"]
                  [lein-cljsbuild "1.1.8"]]
   :repl-options {:init-ns drums.core}
-  :source-paths ["src/clj"]
-  :main drums.core
-  :cljsbuild {
-    :builds [{
-        :source-paths ["src/cljs"]
-        :figwheel true
-        :compiler {
-          :output-to "resources/public/js/cljsbuild-main.js"
-          :output-dir "resources/public/js/cljs-dev/"
-          :optimizations :whitespace
-          :pretty-print true}}]})
+
+  :resource-paths ["resources" "target"]
+  :clean-targets ^{:protect false} [:target-path]
+
+  :profiles {:dev {:cljsbuild
+                   {:builds {:client
+                             {:figwheel {:on-jsload "drums.core/run"}
+                              :compiler {:main "drums.core"
+                                         :optimizations :none}}}}}
+
+             :prod {:cljsbuild
+                    {:builds {:client
+                              {:compiler {:optimizations :advanced
+                                          :elide-asserts true
+                                          :pretty-print false}}}}}}
+
+  :figwheel {:repl false
+             :http-server-root "public"}
+
+  :cljsbuild {:builds {:client
+                       {:source-paths ["src"]
+                        :compiler {:output-dir "target/public/client"
+                                   :asset-path "client"}}}})
+
