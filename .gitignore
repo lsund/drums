@@ -11,5 +11,6 @@ pom.xml.asc
 .hgignore
 .hg/
 tr909
-resources/public/js/cljs-dev/
-resources/public/js/cljsbuild-main.js
+resources/public/js
+resources/public/client/
+resources/public/main.js

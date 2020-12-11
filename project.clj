@@ -13,7 +13,7 @@
                  [lein-cljsbuild "1.1.8"]]
   :repl-options {:init-ns drums.core}
 
-  :resource-paths ["resources" "target"]
+  :resource-paths ["resources"]
   :clean-targets ^{:protect false} [:target-path]
 
   :profiles {:dev {:cljsbuild
@@ -29,11 +29,11 @@
                                           :pretty-print false}}}}}}
 
   :figwheel {:repl false
-             :css-dirs ["target/public"]
+             :css-dirs ["resources/public"]
              :http-server-root "public"}
 
   :cljsbuild {:builds {:client
                        {:source-paths ["src"]
-                        :compiler {:output-dir "target/public/client"
+                        :compiler {:output-dir "resources/public/client"
                                    :asset-path "client"}}}})
 
