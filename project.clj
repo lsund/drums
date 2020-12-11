@@ -29,6 +29,7 @@
                                           :pretty-print false}}}}}}
 
   :figwheel {:repl false
+             :css-dirs ["target/public"]
              :http-server-root "public"}
 
   :cljsbuild {:builds {:client
