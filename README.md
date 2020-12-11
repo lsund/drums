@@ -1,6 +1,6 @@
 # Drums
 
-A drum machine
+A drum machine. Tested on Chrome v. 87 (Linux)
 
 ## Usage
 
