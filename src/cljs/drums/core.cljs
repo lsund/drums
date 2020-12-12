@@ -9,22 +9,23 @@
 
 (def event-channel (chan))
 
+
+;; The :instruments have one static part and one dynamic part.
+;; [:instruments instrument :config] is static and should not be changed during runtime
+;; [:instruments instrument :data] holds information on which steps that are active for
+;; the instrument.
 (defonce app-state
   (r/atom
     {:tick 0
      :bpm 130
      :interval nil
-     :snares {}
-     :highhats {}
-     :kicks {}}))
-
-(def instruments {:kicks {:url "./media/kick.wav" :volume "1.0"}
-                 :highhats {:url "./media/highhat.wav" :volume "0.1"}
-                 :snares {:url "./media/clap.wav" :volume "0.1"}})
+     :instruments {:kick {:config {:url "./media/kick.wav" :volume "1.0"} :data {}}
+                   :hh-open {:config {:url "./media/highhat-closed.wav" :volume "0.1"} :data {}}
+                   :hh-closed {:config {:url "./media/highhat-open.wav" :volume "0.1"} :data {}}}}))
 
 (defn generate-audio [instrument bar-id]
-  (let [audio (js/Audio. (get-in instruments [instrument :url]))]
-    (set! audio -volume (get-in instruments [instrument :volume]))
+  (let [audio (js/Audio. (get-in @app-state [:instruments instrument :config :url]))]
+    (set! audio -volume (get-in @app-state [:instruments instrument  :config :volume]))
     (. audio addEventListener "canplaythrough" (fn [] (swap! app-state assoc-in [instrument bar-id :sound :ready] true)))
     audio))
 
@@ -35,16 +36,15 @@
   (. audio play))
 
 (def events {:toggle (fn [{:keys [bid sid instrument]}]
-                       (let [audio (get-in @app-state [instrument (app/bar-id bid sid) :sound])]
+                       (let [audio (get-in @app-state [:instruments instrument :data (app/bar-id bid sid) :sound])]
                          (if audio
-                           (swap! app-state assoc-in [instrument (app/bar-id bid sid) :sound] nil)
+                           (swap! app-state assoc-in [:instruments instrument :data (app/bar-id bid sid) :sound] nil)
                            (do
                              (let [audio (generate-audio instrument (app/bar-id bid sid))]
-                               (swap! app-state assoc-in [instrument (app/bar-id bid sid) :sound] {:source audio :ready true}))))))
+                               (swap! app-state assoc-in [:instruments instrument :data (app/bar-id bid sid) :sound] {:source audio :ready true}))))))
              :reset (fn [data]
-                      (swap! app-state assoc :snares {})
-                      (swap! app-state assoc :highhats {})
-                      (swap! app-state assoc :kicks {}))
+                      (doseq [instrument (keys (:instruments :app-state))]
+                        (swap! app-state assoc-in [:instruments instrument :data] {})))
              :stop (fn [data]
                      )
              :toggle-start (fn [data]
@@ -61,17 +61,18 @@
              :tick (fn []
                      (swap! app-state update :tick inc)
                      (let [id (mod (:tick @app-state) 16)]
-                       (doseq [instrument [:kicks :snares :highhats]]
-                         (let [{:keys [source ready]} (get-in @app-state [instrument id :sound])]
+                       (doseq [instrument (keys (:instruments @app-state))]
+                         (let [{:keys [source ready]} (get-in @app-state [:instruments instrument :data id :sound])]
                            (when (and source ready)
                              (play-audio source))))))})
 
 (defn app []
+  ; (pprint @app-state)
   [:div.main
    [:div.header (str "BPM: " (:bpm @app-state))]
-   (app/four-beat :kicks event-channel (:kicks @app-state) (:tick @app-state))
-   (app/four-beat :snares event-channel (:snares @app-state) (:tick @app-state))
-   (app/four-beat :highhats event-channel (:highhats @app-state) (:tick @app-state))
+   (app/four-beat :kick event-channel (get-in @app-state [:instruments :kick]) (:tick @app-state))
+   (app/four-beat :hh-open event-channel (get-in @app-state [:instruments :hh-open]) (:tick @app-state))
+   (app/four-beat :hh-closed event-channel (get-in @app-state [:instruments :hh-closed]) (:tick @app-state))
    [:div.separator]
    [:div.buttons
     [:button

@@ -19,7 +19,7 @@
   [:div.beat
    {:key (str "beat-" bid)}
    (for [sid (range 0 4)]
-     (let [cell (get cells (+ (* bid 4) sid))]
+     (let [cell (get-in cells [:data (+ (* bid 4) sid)])]
        [:div.cell
         {:key (str "step-" sid)}
         [:div {:class (cond
