@@ -67,7 +67,7 @@
                              (play-audio source))))))})
 
 (defn app []
-  (pprint @app-state)
+  ; (pprint @app-state)
   [:div.main
    [:div.header (str "BPM: " (:bpm @app-state))]
    (app/four-beat :kick event-channel (get-in @app-state [:instruments :kick]) (:tick @app-state))

@@ -1,5 +1,7 @@
 (defproject drums "0.1.0-SNAPSHOT"
-  :plugins [[lein-figwheel "0.5.20"]]
+  :plugins [[lein-figwheel "0.5.20"]
+            [lein-cljsbuild "1.1.8"]
+            [lein-ring "0.8.7"]]
   :min-lein-version "2.0.0"
   :description "Drum machine"
   :url "https://github.com/lsund/drums"
@@ -18,6 +20,7 @@
                  [reagent "1.0.0-rc1"]
                  [hiccup "1.0.5"]]
 
+  :hooks [leiningen.cljsbuild]
   :resource-paths ["resources"]
   :clean-targets ^{:protect false} [:target-path]
 
@@ -33,6 +36,7 @@
                        {:source-paths ["src"]
                         :figwheel {:on-jsload "drums.core/run"}
                         :compiler {:output-dir "resources/public/client"
+                                   :output-to "resources/public/main.js"
                                    :main "drums.core"
                                    :asset-path "client"}}}})
 
