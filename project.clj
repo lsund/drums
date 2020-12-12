@@ -7,8 +7,6 @@
   :url "https://github.com/lsund/drums"
   :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
             :url "https://www.eclipse.org/legal/epl-2.0/"}
-  :profiles {:uberjar {:aot :all}
-             :prep-tasks ["compile" ["cljsbuild" "once"]]}
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/clojurescript "1.10.764"]
                  [org.clojure/core.async "1.3.610"]
@@ -23,6 +21,8 @@
                  [hiccup "1.0.5"]]
   :resource-paths ["resources"]
   :clean-targets ^{:protect false} [:target-path]
+  :hooks [leiningen.cljsbuild]
+  :profiles {:uberjar {:aot :all}}
 
   :figwheel {:repl false
              :css-dirs ["resources/public"]
