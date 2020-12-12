@@ -28,7 +28,7 @@
              :css-dirs ["resources/public"]
              :http-server-root "public"}
 
-  :uberjar-name "drums-stanalone.jar"
+  :uberjar-name "drums-standalone.jar"
 
   :source-paths ["src/clj"]
   :main drums.main
