@@ -9,32 +9,41 @@
 
 (def event-channel (chan))
 
-(defn- bpm-to-interval [bpm] (* (/ 60.0 4.0 bpm) 1000))
-
 (defonce app-state
   (r/atom
     {:tick 0
      :bpm 130
      :interval nil
      :snares {}
+     :highhats {}
      :kicks {}}))
 
-(defn generate-audio [instrument]
-  (case instrument
-    :kicks (js/Audio. "media/tr909/wav/BT3A0D0.WAV")
-    :snares (let [audio (js/Audio. "media/tr909/wav/HHOD2.WAV")]
-              (set! audio -volume "0.1")
-              audio)))
+(def instruments {:kicks {:url "./media/kick.wav" :volume "1.0"}
+                 :highhats {:url "./media/highhat.wav" :volume "0.1"}
+                 :snares {:url "./media/clap.wav" :volume "0.1"}})
+
+(defn generate-audio [instrument bar-id]
+  (let [audio (js/Audio. (get-in instruments [instrument :url]))]
+    (set! audio -volume (get-in instruments [instrument :volume]))
+    (. audio addEventListener "canplaythrough" (fn [] (swap! app-state assoc-in [instrument bar-id :sound :ready] true)))
+    audio))
+
+
+(defn- bpm-to-interval [bpm] (* (/ 60.0 4.0 bpm) 1000))
+
+(defn- play-audio [audio]
+  (. audio play))
 
 (def events {:toggle (fn [{:keys [bid sid instrument]}]
                        (let [audio (get-in @app-state [instrument (app/bar-id bid sid) :sound])]
                          (if audio
                            (swap! app-state assoc-in [instrument (app/bar-id bid sid) :sound] nil)
                            (do
-                             (let [audio (generate-audio instrument)]
-                               (swap! app-state assoc-in [instrument (app/bar-id bid sid) :sound] audio))))))
+                             (let [audio (generate-audio instrument (app/bar-id bid sid))]
+                               (swap! app-state assoc-in [instrument (app/bar-id bid sid) :sound] {:source audio :ready true}))))))
              :reset (fn [data]
                       (swap! app-state assoc :snares {})
+                      (swap! app-state assoc :highhats {})
                       (swap! app-state assoc :kicks {}))
              :stop (fn [data]
                      )
@@ -43,7 +52,7 @@
                                (do
                                  (js/clearInterval (:interval @app-state))
                                  (swap! app-state assoc :interval nil))
-                              (swap! app-state assoc :interval (js/setInterval (fn [] (put! event-channel [:tick {}])) (bpm-to-interval (:bpm @app-state))))))
+                               (swap! app-state assoc :interval (js/setInterval (fn [] (put! event-channel [:tick {}])) (bpm-to-interval (:bpm @app-state))))))
              :change-speed (fn [{:keys [amount op]}]
                              (swap! app-state update :bpm #((case op :inc + -) % amount))
                              (when (:interval @app-state)
@@ -51,20 +60,18 @@
                                (put! event-channel [:toggle-start {}])))
              :tick (fn []
                      (swap! app-state update :tick inc)
-                     (let [id (mod (:tick @app-state) 16)
-                           kick (get-in @app-state [:kicks id :sound])
-                           snare (get-in @app-state [:snares id :sound])]
-                       (when kick
-                         (. kick play))
-                       (when snare
-                         (. snare play))))})
+                     (let [id (mod (:tick @app-state) 16)]
+                       (doseq [instrument [:kicks :snares :highhats]]
+                         (let [{:keys [source ready]} (get-in @app-state [instrument id :sound])]
+                           (when (and source ready)
+                             (play-audio source))))))})
 
 (defn app []
-  (pprint @app-state)
   [:div.main
    [:div.header (str "BPM: " (:bpm @app-state))]
    (app/four-beat :kicks event-channel (:kicks @app-state) (:tick @app-state))
    (app/four-beat :snares event-channel (:snares @app-state) (:tick @app-state))
+   (app/four-beat :highhats event-channel (:highhats @app-state) (:tick @app-state))
    [:div.separator]
    [:div.buttons
     [:button
