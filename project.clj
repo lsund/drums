@@ -19,8 +19,6 @@
                  [http-kit "2.5.0"]
                  [reagent "1.0.0-rc1"]
                  [hiccup "1.0.5"]]
-
-  :hooks [leiningen.cljsbuild]
   :resource-paths ["resources"]
   :clean-targets ^{:protect false} [:target-path]
 
