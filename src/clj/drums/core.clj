@@ -1,11 +1,13 @@
-(ns drums.core)
+(ns drums.core
+  (:require
+   [com.stuartsierra.component :as c]
+   [drums.app :as app]
+   [drums.server :as server]))
 
-;; The core abstraction is a namespace, not a file
-
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
-
-(defn -main []
-  (foo 12))
+(defn new-system
+  [config]
+  (c/system-map :server (c/using (server/new-server (:server config))
+                                 [:app])
+                :app (c/using (app/new-app (:app config))
+                              [])
+                ))

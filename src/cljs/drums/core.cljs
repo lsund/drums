@@ -43,7 +43,7 @@
                              (let [audio (generate-audio instrument (app/bar-id bid sid))]
                                (swap! app-state assoc-in [:instruments instrument :data (app/bar-id bid sid) :sound] {:source audio :ready true}))))))
              :reset (fn [data]
-                      (doseq [instrument (keys (:instruments :app-state))]
+                      (doseq [instrument (keys (:instruments  @app-state))]
                         (swap! app-state assoc-in [:instruments instrument :data] {})))
              :stop (fn [data]
                      )
@@ -67,7 +67,7 @@
                              (play-audio source))))))})
 
 (defn app []
-  ; (pprint @app-state)
+  (pprint @app-state)
   [:div.main
    [:div.header (str "BPM: " (:bpm @app-state))]
    (app/four-beat :kick event-channel (get-in @app-state [:instruments :kick]) (:tick @app-state))
