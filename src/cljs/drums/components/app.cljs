@@ -3,20 +3,34 @@
             [cljs.core.async :refer (put!)]
             [reagent.core :as r]))
 
-(def button-names {:toggle "Toggle"
-                   :unload-sound "Unload sound"
-                   :play "Play"})
+;; One bar = four beats
+;; one beat = four steps
+;;
+;; bid = Bar ID
+;; sid = Step Id
 
-(defn sub-component [instrument event-channel cells tick]
-  (for [id (range 0 8)]
-    (let [cell (get cells id)]
-      [:div
-       {:key (str "item-" id)
-        :class (cond
-                 (and (:sound cell) (= (mod tick 8) id)) "item loaded active"
-                 (:sound cell) "item loaded"
-                 (= (mod tick 8) id) "item active"
-                 :otherwise "item")}
-       [:p (str "Cell " id)]
-       [:button {:on-click (fn [event] (put! event-channel [:toggle {:id id :instrument instrument}]))} (:toggle button-names)]])))
+(defn bar-id [beat-id sid]
+  (+ (* beat-id 4) sid))
+
+(defn active-cell? [tick bid sid]
+  (= (mod tick 16) (bar-id bid sid)))
+
+(defn beat [instrument event-channel cells tick bid]
+  [:div.beat
+   {:key (str "beat-" bid)}
+   (for [sid (range 0 4)]
+     (let [cell (get cells (+ (* bid 4) sid))]
+       [:div.cell
+        {:key (str "step-" sid)}
+        [:div {:class (cond
+                        (and (:sound cell) (active-cell? tick bid sid)) "cell loaded active"
+                        (:sound cell) "cell loaded"
+                        (active-cell? tick bid sid) "cell active"
+                        :otherwise "cell")
+               :on-click (fn [event] (put! event-channel [:toggle {:bid bid :sid sid :instrument instrument}]))}]]))])
+
+(defn four-beat [instrument event-channel cells tick]
+  [:div.bar
+    (for [bid (range 0 4)]
+      (beat instrument event-channel cells tick bid))])
 
