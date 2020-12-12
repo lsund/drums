@@ -9,8 +9,7 @@
                  [org.clojure/clojurescript "1.10.764"]
                  [org.clojure/core.async "1.3.610"]
                  [reagent "1.0.0-rc1"]
-                 [hiccup "1.0.5"]
-                 [lein-cljsbuild "1.1.8"]]
+                 [hiccup "1.0.5"]]
 
   :resource-paths ["resources"]
   :clean-targets ^{:protect false} [:target-path]
