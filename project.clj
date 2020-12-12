@@ -11,7 +11,6 @@
                  [reagent "1.0.0-rc1"]
                  [hiccup "1.0.5"]
                  [lein-cljsbuild "1.1.8"]]
-  :repl-options {:init-ns drums.core}
 
   :resource-paths ["resources"]
   :clean-targets ^{:protect false} [:target-path]
