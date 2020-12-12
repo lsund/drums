@@ -1,1 +1,1 @@
-web: lein cljsbuild once && java $JVM_OPTS -cp target/finances-standalone.jar clojure.main -m drums.main
+web: lein cljsbuild once && lein uberjar && java $JVM_OPTS -cp target/drums-standalone.jar clojure.main -m drums.main

@@ -26,6 +26,8 @@
              :css-dirs ["resources/public"]
              :http-server-root "public"}
 
+  :uberjar-name "drums-stanalone.jar"
+
   :source-paths ["src/clj"]
   :main drums.main
   :ring {:handler drums.core/new-handler}
